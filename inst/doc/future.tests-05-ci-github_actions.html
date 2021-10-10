@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>future.tests: Continuous Integration on GitHub Actions</title>
+<style>
+body {
+  font-family: sans-serif;
+  line-height: 1.6;
+  padding-left: 3ex;
+  padding-right: 3ex;
+  background-color: white;
+  color: black;
+}
+
+a {
+  color: #4183C4;
+  text-decoration: none;
+}
+
+h1, h2, h3 {
+  margin: 2ex 0 1ex;
+  padding: 0;
+  font-weight: bold;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative;
+}
+
+h2 {
+  border-bottom: 1px solid #cccccc;
+}
+
+code {
+  margin: 0 2px;
+  padding: 0 5px;
+  white-space: nowrap;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+  border-radius: 3px;
+}
+
+pre code {
+  margin: 0;
+  padding: 0;
+  white-space: pre;
+  border: none;
+  background: transparent;
+}
+
+pre {
+  background-color: #f8f8f8;
+  border: 1px solid #cccccc;
+  line-height: 2.5x;
+  overflow: auto;
+  padding: 0.6ex 1ex;
+  border-radius: 3px;
+}
+
+pre code {
+  background-color: transparent;
+  border: none;
+}
+</style>
+</head>
+<body>
+<h1>future.tests: Continuous Integration on GitHub Actions</h1>
+<!--
+%\VignetteIndexEntry{future.tests: Continuous Integration on GitHub Actions}
+%\VignetteAuthor{Henrik Bengtsson}
+%\VignetteKeyword{R}
+%\VignetteKeyword{package}
+%\VignetteKeyword{vignette}
+%\VignetteKeyword{future}
+%\VignetteKeyword{continuous integration}
+%\VignetteKeyword{CI}
+%\VignetteKeyword{GitHub Actions}
+%\VignetteEngine{future.tests::selfonly}
+-->
+<p>We can use continuous integration (CI) services such as GitHub Action and Travis CI to automatically validate <strong><a href="https://cran.r-project.org/package=future">future</a></strong> backends via the <strong><a href="https://cran.r-project.org/package=future.tests">future.tests</a></strong> test suite.</p>
+<p>Here is an example of a <code>.github/workflow/future.tests.yaml</code> file that configures GitHub Actions to check several backends via the <strong>future.tests</strong> test suite.</p>
+<pre><code class="language-yaml">on: [push, pull_request]
+
+name: future_tests
+
+jobs:
+  future_tests:
+    if: &quot;! contains(github.event.head_commit.message, '[ci skip]')&quot;    
+
+    runs-on: ubuntu-20.04
+
+    name: future.plan=${{ matrix.future.plan }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        future:
+          - { plan: 'cluster'                             }
+          - { plan: 'multicore'                           }
+          - { plan: 'multisession'                        }
+          - { plan: 'sequential'                          }
+          - { plan: 'future.batchtools::batchtools_local' }
+          - { plan: 'future.callr::callr'                 }
+
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      RSPM: https://packagemanager.rstudio.com/cran/__linux__/focal/latest
+      R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
+      ## R CMD check
+      _R_CHECK_LENGTH_1_CONDITION_: true
+      _R_CHECK_LENGTH_1_LOGIC2_: true
+      _R_CHECK_MATRIX_DATA_: true
+      _R_CHECK_CRAN_INCOMING_: false
+      ## Specific to futures
+      R_FUTURE_RNG_ONMISUSE: error
+      
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: r-lib/actions/setup-r@master
+        with:
+          r-version: release
+
+      - uses: r-lib/actions/setup-pandoc@master
+
+      - name: Query R package dependencies
+        run: |
+          install.packages('remotes')
+          saveRDS(remotes::dev_package_deps(dependencies = TRUE), &quot;.github/depends.Rds&quot;, version = 2)
+          writeLines(sprintf(&quot;R-%i.%i&quot;, getRversion()$major, getRversion()$minor), &quot;.github/R-version&quot;)
+        shell: Rscript {0}
+
+      - name: Cache R packages
+        uses: actions/cache@v1
+        with:
+          path: ${{ env.R_LIBS_USER }}
+          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
+          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+
+      - name: Install R package system dependencies (Linux)
+        if: runner.os == 'Linux'
+        env:
+          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
+        run: |
+          Rscript -e &quot;remotes::install_github('r-hub/sysreqs')&quot;
+          sysreqs=$(Rscript -e &quot;cat(sysreqs::sysreq_commands('DESCRIPTION'))&quot;)
+          sudo -s eval &quot;$sysreqs&quot;
+
+      - name: Install R package dependencies
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          install.packages(&quot;.&quot;, repos=NULL, type=&quot;source&quot;)  ## needed by parallel workers
+        shell: Rscript {0}
+          
+      - name: Install 'future.tests' and any backend R packages
+        run: |
+          remotes::install_cran(&quot;future.tests&quot;)
+          if (grepl(&quot;::&quot;, plan &lt;- &quot;${{ matrix.future.plan }}&quot;) &amp;&amp; nzchar(pkg &lt;- sub(&quot;::.*&quot;, &quot;&quot;, plan))) install.packages(pkg)
+        shell: Rscript {0}
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs &lt;- installed.packages()[, &quot;Package&quot;]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
+        shell: Rscript {0}
+    
+      - name: Check future backend '${{ matrix.future.plan }}'
+        run: |
+          R CMD build --no-build-vignettes --no-manual . 
+          R CMD INSTALL *.tar.gz 
+          Rscript -e future.tests::check --args --test-plan=${{ matrix.future.plan }}
+
+      - name: Upload check results
+        if: failure()
+        uses: actions/upload-artifact@master
+        with:
+          name: ${{ runner.os }}-r${{ matrix.future.plan }}-results
+          path: check
+</code></pre>
+<p>For real-world examples, see the GitHub repositories of <a href="https://github.com/HenrikBengtsson/future"><strong>future</strong></a>, <a href="https://github.com/HenrikBengtsson/future.batchtools"><strong>future.batchtools</strong></a>, and <a href="https://github.com/HenrikBengtsson/future.callr"><strong>future.callr</strong></a>.</p>
+</body>
+</html>
