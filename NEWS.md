@@ -1,3 +1,11 @@
+# Version 0.5.0 [2022-12-15]
+
+## New Tests
+
+ * Assert that none of `future()`, `run()`, `result()` and `value()`
+   update the RNG state.
+
+
 # Version 0.4.0 [2022-11-21]
 
 ## New Tests
@@ -28,6 +36,13 @@
  * The TestResult class did not record whether the test was evaluated
    in a local environment or not.
 
+ * A too strict internal assertion would give `Error in
+   evaluate_expr(test$expr, envir = envir, local = FALSE, output =
+   output, : identical(Sys.getenv(), old$envvars) is not TRUE` for R
+   4.2.x and R-devel on MS Windows.  This was because it is not
+   possible to remove environment variables on MS Windows; they can
+   only be set to an empty value.
+ 
 
 # Version 0.3.0 [2021-10-09]
 

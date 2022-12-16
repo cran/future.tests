@@ -1,6 +1,6 @@
-accf3d8f58726da19a4e9232e7bf4efc *DESCRIPTION
+fd74215381697060458a1cbf9f32f0da *DESCRIPTION
 6ad92128fad515d2b6cfa0493bc71e7a *NAMESPACE
-177f626ced5d30b98585fb04539206f8 *NEWS.md
+20058218bd10d4369a72cc06ed805142 *NEWS.md
 742ebb9c4681a5153b4380e2de16b390 *R/Test-class.R
 6018e4d45b5d5d0cc64816da123a6cbc *R/TestResult-class.R
 6eca8cfe252e4c042fbf05ed366c4e93 *R/along_test_plans.R
@@ -21,8 +21,8 @@ b6ba4c7f409b0b74e27b0a5870a080aa *R/zzz.R
 ef999e55ce8b1ca8e3162c782f31a5b6 *build/vignette.rds
 e0b9cc9cb684d56cf081372940cd6bc3 *inst/CITATION
 8940ebaee65a8cb183d290df8825bf25 *inst/WORDLIST
-c1a39031d28df95a8c9b3679a51c50b1 *inst/doc/future.tests-01-intro.html
-d38efe3b5d5f7a6804e02c0137727ecc *inst/doc/future.tests-01-intro.md
+3d88e953ec4109fdbb45ef922d9b55bf *inst/doc/future.tests-01-intro.html
+5a9fd1296774c8ac8d20ea049b3195a8 *inst/doc/future.tests-01-intro.md
 12e82782a0daf6f80244f579abde7fb7 *inst/doc/future.tests-05-ci-github_actions.html
 b0e2f583750a15f556a44715d52c5419 *inst/doc/future.tests-05-ci-github_actions.md
 2ab019ce59c46247e63f34be90fecdaf *inst/doc/future.tests-05-ci-travis.html
@@ -42,7 +42,7 @@ e8f7b636a033cdb9ac925ddd93cba71e *inst/test-db/futureCall.R
 a14d25739c33cdc014de0d1331a152e8 *inst/test-db/plan.R
 5d288751e4ed58e512e3dfeeed0a711a *inst/test-db/resolve.R
 f56756fd61f2d36244590a50a7078d1d *inst/test-db/resolved-lazy.R
-f99711ef6179af4a3b4d0620886de14e *inst/test-db/seeds.R
+15fc0ae5bccbc764793d6b54f76dc378 *inst/test-db/seeds.R
 9462c88dd4c7ae887c438590689b8efd *inst/test-db/stdout.R
 5f590c7b448f033c85ea7ccb00ff215f *inst/test-db/visibility.R
 389178c52f5b6a006b2c8fc4ff050bab *man/add_test_plan.Rd
@@ -71,7 +71,7 @@ ff867fc7fb6cc02fdbbfb1aa537e5fab *tests/one-test.R
 a5585a2156356f0c98b07725d867b71d *tests/test_plans.R
 daef4d60bd65d0de08e3b5bed0722963 *tests/utils.R
 4c609d705e13573760ca60ffe3ff2cd7 *tests/zzz.onLoad.R
-d38efe3b5d5f7a6804e02c0137727ecc *vignettes/future.tests-01-intro.md
+5a9fd1296774c8ac8d20ea049b3195a8 *vignettes/future.tests-01-intro.md
 b0e2f583750a15f556a44715d52c5419 *vignettes/future.tests-05-ci-github_actions.md
 ce6968afbc7ed120b315eb7172076e86 *vignettes/future.tests-05-ci-travis.md
 b577d06f257b510e6694b72744a878ec *vignettes/imgs/screencast.gif
