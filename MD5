@@ -1,6 +1,6 @@
-cb9866dd2d9959da0cc3181a3b4e3700 *DESCRIPTION
+5abe5697de026496a547631c5730b1b5 *DESCRIPTION
 b9b9eea2bebe51851952bf51a85a75e8 *NAMESPACE
-71a52e6af041a697fe82cd92e3f505d6 *NEWS.md
+3a7ec2e3078bcfd904ad4bc3cba67419 *NEWS.md
 742ebb9c4681a5153b4380e2de16b390 *R/Test-class.R
 7427d385515cb9223fdcff5e374ec5d5 *R/TestResult-class.R
 6eca8cfe252e4c042fbf05ed366c4e93 *R/along_test_plans.R
@@ -19,7 +19,7 @@ a35ca90dc306efc62e3a37e8ecf21692 *R/test_db.R
 f076f30584783a7e8cd6c62789c01eab *R/vignette_engine.R
 da6cb4504479c0a7f207d2e3528cf5c3 *R/zzz.R
 1d53a75f91c6c9a3bb60e2da6a3c364c *R/zzz.cli.R
-ef999e55ce8b1ca8e3162c782f31a5b6 *build/vignette.rds
+2ee0aee1a9ef1280368b2b4ce532756c *build/vignette.rds
 e95c71b9cdbeaaa9724b59704dfc3c5a *inst/CITATION
 8940ebaee65a8cb183d290df8825bf25 *inst/WORDLIST
 3d88e953ec4109fdbb45ef922d9b55bf *inst/doc/future.tests-01-intro.html
@@ -40,10 +40,10 @@ e8f7b636a033cdb9ac925ddd93cba71e *inst/test-db/futureCall.R
 609e7a14c034d27e71ad45c6056e94a2 *inst/test-db/mandelbrot.R
 1035e1a913ffa6e4ced5ae6e76c9d05a *inst/test-db/nbrOfWorkers.R
 150ba0439d3a23d098f0c957519feda2 *inst/test-db/options,data.table.R
-a1efdd1d9196106050169ba10153cfb5 *inst/test-db/options,ff.R
-6037b302facd3155abbec9eca3cfe2a1 *inst/test-db/plan.R
+ede89feac7cd145b2daaa5995f0b147b *inst/test-db/options,ff.R
+d323935567ccab0d14892c98be8e47a5 *inst/test-db/plan.R
 5d288751e4ed58e512e3dfeeed0a711a *inst/test-db/resolve.R
-f56756fd61f2d36244590a50a7078d1d *inst/test-db/resolved-lazy.R
+91c3468a694455907ea87ba392bf81c7 *inst/test-db/resolved-lazy.R
 15fc0ae5bccbc764793d6b54f76dc378 *inst/test-db/seeds.R
 9462c88dd4c7ae887c438590689b8efd *inst/test-db/stdout.R
 5f590c7b448f033c85ea7ccb00ff215f *inst/test-db/visibility.R
