@@ -76,7 +76,7 @@ pre code {
 %\VignetteKeyword{GitHub Actions}
 %\VignetteEngine{future.tests::selfonly}
 -->
-<p>We can use continuous integration (CI) services such as GitHub Action and Travis CI to automatically validate <strong><a href="https://cran.r-project.org/package=future">future</a></strong> backends via the <strong><a href="https://cran.r-project.org/package=future.tests">future.tests</a></strong> test suite.</p>
+<p>We can use continuous integration (CI) services such as GitHub Action and Travis CI to automatically validate <strong><a href="https://future.futureverse.org">future</a></strong> backends via the <strong><a href="https://future.tests.futureverse.org">future.tests</a></strong> test suite.</p>
 <p>Here is an example of a <code>.github/workflow/future.tests.yaml</code> file that configures GitHub Actions to check several backends via the <strong>future.tests</strong> test suite.</p>
 <pre><code class="language-yaml">on: [push, pull_request]
 
@@ -88,7 +88,7 @@ jobs:
 
     timeout-minutes: 30
     
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
 
     name: future.plan=${{ matrix.future.plan }}
 
@@ -101,61 +101,55 @@ jobs:
           - { plan: 'multisession'                        }
           - { plan: 'sequential'                          }
           - { plan: 'future.batchtools::batchtools_local' }
+          - { plan: 'future.batchtools::batchtools_bash'  }
           - { plan: 'future.callr::callr'                 }
+          - { plan: 'future.mirai::mirai_multisession'    }
+          - { plan: 'future.mirai::mirai_cluster'         }
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-      RSPM: https://packagemanager.rstudio.com/cran/__linux__/focal/latest
       R_REMOTES_NO_ERRORS_FROM_WARNINGS: true
       ## R CMD check
-      _R_CHECK_LENGTH_1_CONDITION_: true
-      _R_CHECK_LENGTH_1_LOGIC2_: true
       _R_CHECK_MATRIX_DATA_: true
       _R_CHECK_CRAN_INCOMING_: false
       ## Specific to futures
       R_FUTURE_RNG_ONMISUSE: error
       
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
 
       - uses: r-lib/actions/setup-r@v2
         with:
-          r-version: release
+          use-public-rspm: true
 
-      - name: Query R package dependencies
-        run: |
-          install.packages('remotes')
-          saveRDS(remotes::dev_package_deps(dependencies = TRUE), &quot;.github/depends.Rds&quot;, version = 2)
-          writeLines(sprintf(&quot;R-%i.%i&quot;, getRversion()$major, getRversion()$minor), &quot;.github/R-version&quot;)
-        shell: Rscript {0}
-
-      - name: Cache R packages
-        uses: actions/cache@v3
+      - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          path: ${{ env.R_LIBS_USER }}
-          key: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-${{ hashFiles('.github/depends.Rds') }}
-          restore-keys: ${{ runner.os }}-${{ hashFiles('.github/R-version') }}-1-
+          extra-packages: |
+            any::rcmdcheck
+            any::remotes
+            any::sessioninfo
+            any::covr
+          needs: check
 
-      - name: Install R package system dependencies (Linux)
-        if: runner.os == 'Linux'
-        env:
-          RHUB_PLATFORM: linux-x86_64-ubuntu-gcc
-        run: |
-          Rscript -e &quot;remotes::install_github('r-hub/sysreqs')&quot;
-          sysreqs=$(Rscript -e &quot;cat(sysreqs::sysreq_commands('DESCRIPTION'))&quot;)
-          sudo -s eval &quot;$sysreqs&quot;
-
-      - name: Install R package dependencies
+      - name: Install dependencies
         run: |
           remotes::install_deps(dependencies = TRUE)
-          install.packages(&quot;.&quot;, repos=NULL, type=&quot;source&quot;)  ## needed by parallel workers
+          install.packages(&quot;.&quot;, repos=NULL, type=&quot;source&quot;)
+        shell: Rscript {0}
+
+      - name: Session info
+        run: |
+          options(width = 100)
+          pkgs &lt;- installed.packages()[, &quot;Package&quot;]
+          sessioninfo::session_info(pkgs, include_base = TRUE)
         shell: Rscript {0}
           
       - name: Install 'future.tests' and any backend R packages
         run: |
           remotes::install_cran(&quot;future.tests&quot;)
+          remotes::install_github(&quot;HenrikBengtsson/future.tests&quot;, ref=&quot;develop&quot;)
           if (grepl(&quot;::&quot;, plan &lt;- &quot;${{ matrix.future.plan }}&quot;) &amp;&amp; nzchar(pkg &lt;- sub(&quot;::.*&quot;, &quot;&quot;, plan))) install.packages(pkg)
         shell: Rscript {0}
 
@@ -174,11 +168,11 @@ jobs:
 
       - name: Upload check results
         if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ runner.os }}-r${{ matrix.future.plan }}-results
           path: check
 </code></pre>
-<p>For real-world examples, see the GitHub repositories of <a href="https://github.com/HenrikBengtsson/future"><strong>future</strong></a>, <a href="https://github.com/HenrikBengtsson/future.batchtools"><strong>future.batchtools</strong></a>, and <a href="https://github.com/HenrikBengtsson/future.callr"><strong>future.callr</strong></a>.</p>
+<p>For real-world examples, see the GitHub repositories of <a href="https://github.com/futureverse/future"><strong>future</strong></a>, <a href="https://github.com/futureverse/future.batchtools"><strong>future.batchtools</strong></a>, <a href="https://github.com/futureverse/future.callr"><strong>future.callr</strong></a>, and <a href="https://github.com/futureverse/future.mirai"><strong>future.callr</strong></a>.</p>
 </body>
 </html>
