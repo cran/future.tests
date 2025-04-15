@@ -1,3 +1,10 @@
+# Version 0.9.0 [2025-04-14]
+
+## New Features
+
+ * Now the test code is displayed if there is a check error.
+
+
 # Version 0.8.0 [2024-03-31]
 
 ## New Features
